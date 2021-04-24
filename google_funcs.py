@@ -29,8 +29,7 @@ sheets_service = build('sheets', 'v4', credentials=credentials)
 
 
 def add_new_trainee(table_id, list_name, values, id_bd):
-    _range = list_name + ("!A%s:AP%s" % (str(id_bd+2),str(id_bd+2)))
-    print(_range)
+    _range = list_name + ("!A%s:AP%s" % (str(id_bd+1),str(id_bd+1)))
     body = {"valueInputOption": "USER_ENTERED", # Данные воспринимаются, как вводимые пользователем (считается значение формул)
     "data": [
         {"range": _range,
@@ -42,5 +41,7 @@ def add_new_trainee(table_id, list_name, values, id_bd):
     sheets_service.spreadsheets().values().batchUpdate(spreadsheetId=table_id,
                                                         body=body).execute()
 
+def get_forms_list(tg_id):
+    pass
 
 

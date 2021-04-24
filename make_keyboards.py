@@ -1,4 +1,5 @@
 from telebot import types
+import db_funcs
 
 def make_actions_endfill_keyboard():
     keyboard = types.ReplyKeyboardMarkup()
@@ -7,12 +8,14 @@ def make_actions_endfill_keyboard():
     keyboard.add(types.KeyboardButton("Отменить заполнение"))
     return keyboard
 
+
 def make_choose_keyboard(items_list):
     keyboard = types.InlineKeyboardMarkup()
     for item in items_list:
-        keyboard.add(types.InlineKeyboardButton(text=item.capitalize(),
+        keyboard.add(types.InlineKeyboardButton(text=item,
                                                 callback_data=item))
     return keyboard
+
 
 def make_choose_edutype_keyboard():
     keyboard = types.InlineKeyboardMarkup()
@@ -72,10 +75,11 @@ def make_choose_city_keyboard():
 def make_form_actions_keyboard(tg_id):
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
     keyboard.add(types.KeyboardButton('Сформировать новую анкету'))
-    if (db_funcs.check_user_in_db('users.db', 'users', tg_id) is False):
-        keyboard.add(types.KeyboardButton('Просмотреть свою анкету'))
+    if (db_funcs.check_user_in_db('users.db', 'users', tg_id) is not False):
+        keyboard.add(types.KeyboardButton('Просмотреть свои анкеты'))
     keyboard.row()
     return keyboard
+
 
 def make_welcome_actions_keyboard():
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
@@ -84,7 +88,8 @@ def make_welcome_actions_keyboard():
     keyboard.row()
     return keyboard
 
+
 def make_formcancel_keyboard():
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
-    keyboard.add(types.KeyboardButton('Отменить заполнение'))
+    keyboard.add(types.KeyboardButton('Назад'), types.KeyboardButton('Отменить заполнение'))
     return keyboard
