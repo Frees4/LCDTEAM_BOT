@@ -4,7 +4,7 @@ import db_funcs
 def make_actions_endfill_keyboard():
     keyboard = types.ReplyKeyboardMarkup()
     keyboard.add(types.KeyboardButton("Отправить форму"))
-    keyboard.add(types.KeyboardButton("Вернуться к шагу №"))
+    keyboard.add(types.KeyboardButton("Просмотреть анкету"))
     keyboard.add(types.KeyboardButton("Отменить заполнение"))
     return keyboard
 
