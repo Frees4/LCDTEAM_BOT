@@ -1,10 +1,8 @@
 import telebot
-import flask
 from telebot import types
 import db_funcs
 import google_funcs
 import datetime
-import calendar
 import re
 from make_keyboards import *
 from bot_funcs import *
@@ -13,7 +11,6 @@ from concurrency import coroutine, sleep, run
 
 reader = open('token.txt', 'r')
 TOKEN = reader.read()
-APP_NAME = 'lcdnautraineebot'
 bot = telebot.TeleBot(TOKEN)
 
 
@@ -63,11 +60,12 @@ def ping(bot, timeout):
                                 reply_markup=make_welcome_actions_keyboard())
 
 
-@bot.message_handler(commands=['help'])
-def answer(message):
-    bot.send_message(chat_id=message.chat.id,
-                    text="test",
-                    reply_markup=types.ReplyKeyboardRemove())
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    keyboard = make_welcome_actions_keyboard()
+    bot.send_message(message.chat.id, "Выберите действие:", reply_markup=keyboard)
+    run()
+
 
 @bot.message_handler(func=lambda message: True)
 def echo_all(message):
@@ -594,6 +592,7 @@ def echo_all(message):
                                     text="Неправильный формат. Повторите ввод",
                                     reply_markup=None)
 
+
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     if call.data == 'new_agree':
@@ -670,7 +669,7 @@ def callback_worker(call):
         file = open(filename, 'r', encoding='utf-8')
         string = ''
         for line in file.readlines():
-            string += (line+)
+            string += (line)
         file.close()
         bot.edit_message_text(chat_id=call.message.chat.id,
                             message_id=call.message.id,
@@ -861,9 +860,6 @@ def callback_worker(call):
                             reply_markup=None)
 
 
-
-
-
 def create_new_form(tg_id):
         db_funcs.delete_user_from_db('users.db', 'users', tg_id)
         db_funcs.add_user_to_db('users.db', 'users', tg_id)
@@ -878,7 +874,6 @@ def create_new_form(tg_id):
         bot.send_message(chat_id=tg_id,
                         text='Выберите город прохождения стажировки',
                         reply_markup=make_choose_keyboard(available_cities))
-
 
 
 ping(bot, 86400) # 24 часа = 60*60*24 = 86400 секунд
