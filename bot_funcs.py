@@ -184,6 +184,8 @@ def send_form(bot, tg_id):
     result.append(userdata[9]) # city living
     result.append(userdata[10]) # email
     result.append(userdata[11]) # telnum
+    result.append(userdata[28]) # test task link
+    result.append(userdata[27]) # summary hh link
     result.append(userdata[13]) # date start internship
     result.append(userdata[14]) # time spend
     result.append(userdata[15]) # can work after
@@ -228,8 +230,6 @@ def send_form(bot, tg_id):
     result.append(userdata[24]) # source info company
     result.append(userdata[25]) # source info internship
     result.append(userdata[26]) # recomendations authors
-    result.append(userdata[27]) # summary hh link
-    result.append(userdata[28]) # test task link
     vals = tuple(result)
     
     db_funcs.add_forminfo_table(db_name, tablename, result[1], vals)

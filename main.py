@@ -1,4 +1,5 @@
 import telebot
+import flask
 from telebot import types
 import db_funcs
 import google_funcs
@@ -10,10 +11,11 @@ from bot_funcs import *
 from concurrency import coroutine, sleep, run
 
 
-
 reader = open('token.txt', 'r')
 TOKEN = reader.read()
+APP_NAME = 'lcdnautraineebot'
 bot = telebot.TeleBot(TOKEN)
+
 
 internship_jobs = ['Стажер-разработчик Java', 'Стажер-тестировщик',
                     'Стажер-аналитик', 'Стажер технический писатель']
@@ -61,18 +63,6 @@ def ping(bot, timeout):
                                 reply_markup=make_welcome_actions_keyboard())
 
 
-
-
-@bot.message_handler(commands=['start'])
-def send_welcome(message):
-    # создаем клавиатуру, make_actions_keyboard - моя функция, возвращает объект клавы
-    # и находится ниже
-
-    keyboard = make_welcome_actions_keyboard()
-    # вызывается метод объекта бота с параметрами id чата, текстом сообщения и конфигом клавиатуры ответа
-    bot.send_message(message.chat.id, "Выберите действие:", reply_markup=keyboard)
-    run()
-
 @bot.message_handler(commands=['help'])
 def answer(message):
     bot.send_message(chat_id=message.chat.id,
@@ -92,7 +82,16 @@ def echo_all(message):
             create_new_form(message.chat.id)
         elif ( message.text.lower() == 'просмотр вакансий' ):
             show_vacancy_cities(bot, message.chat.id)
-        elif ( message.text.lower() == 'подписаться на уведомления о стажировках' ):
+        elif ( message.text.lower() == 'правила приема на стажировку'):
+            file = open('rules.txt', 'r', encoding='utf-8')
+            string = ''
+            for line in file.readlines():
+                string += (line)
+            file.close()
+            bot.send_message(chat_id=message.chat.id,
+                            text=string,
+                            reply_markup=make_welcome_actions_keyboard())
+        elif ( message.text.lower() == 'подписаться на рассылку' ):
             db_funcs.add_user_to_subscribers(message.chat.id)
             bot.send_message(chat_id=message.chat.id,
                             text="Вы подписались на рассылку уведомлений о новых стажировках.",
@@ -671,7 +670,7 @@ def callback_worker(call):
         file = open(filename, 'r', encoding='utf-8')
         string = ''
         for line in file.readlines():
-            string += (line+'\n')
+            string += (line+)
         file.close()
         bot.edit_message_text(chat_id=call.message.chat.id,
                             message_id=call.message.id,

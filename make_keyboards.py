@@ -77,15 +77,13 @@ def make_form_actions_keyboard(tg_id):
     keyboard.add(types.KeyboardButton('Сформировать новую анкету'))
     #if (db_funcs.check_user_in_db('users.db', 'users', tg_id) is not False):
         #keyboard.add(types.KeyboardButton('Просмотреть свои анкеты'))
-    keyboard.row()
     return keyboard
-
 
 def make_welcome_actions_keyboard():
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     keyboard.add(types.KeyboardButton('Работа с анкетой'))
     keyboard.add(types.KeyboardButton('Просмотр вакансий'))
-    keyboard.row()
+    keyboard.add(types.KeyboardButton('Правила приема на стажировку'))
     return keyboard
 
 

@@ -1,1 +1,5 @@
 googlecreds.json
+__pycache__/
+bot.py
+sql_workDB.py
+test.py
