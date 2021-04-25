@@ -7,11 +7,13 @@ import re
 from make_keyboards import *
 from bot_funcs import *
 from concurrency import coroutine, sleep, run
+import rules
 
 
 reader = open('token.txt', 'r')
 TOKEN = reader.read()
 bot = telebot.TeleBot(TOKEN)
+timer_working = False
 
 
 internship_jobs = ['Стажер-разработчик Java', 'Стажер-тестировщик',
@@ -60,11 +62,15 @@ def ping(bot, timeout):
                                 reply_markup=make_welcome_actions_keyboard())
 
 
+
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     keyboard = make_welcome_actions_keyboard()
     bot.send_message(message.chat.id, "Выберите действие:", reply_markup=keyboard)
-    run()
+    global timer_working
+    if (timer_working is False):
+        timer_working = True
+        run()
 
 
 @bot.message_handler(func=lambda message: True)
@@ -81,11 +87,7 @@ def echo_all(message):
         elif ( message.text.lower() == 'просмотр вакансий' ):
             show_vacancy_cities(bot, message.chat.id)
         elif ( message.text.lower() == 'правила приема на стажировку'):
-            file = open('rules.txt', 'r', encoding='utf-8')
-            string = ''
-            for line in file.readlines():
-                string += (line)
-            file.close()
+            string = rules.text
             bot.send_message(chat_id=message.chat.id,
                             text=string,
                             reply_markup=make_welcome_actions_keyboard())
@@ -877,10 +879,6 @@ def create_new_form(tg_id):
 
 
 ping(bot, 86400) # 24 часа = 60*60*24 = 86400 секунд
-keyboard = types.ReplyKeyboardMarkup()
-buttonWorkForms = types.KeyboardButton('Работа с анкетой')
-buttonShowVacancies = types.KeyboardButton('Просмотр вакансий')
-keyboard.row(buttonWorkForms, buttonShowVacancies)
 bot.polling(none_stop=True)
 while True:
     pass

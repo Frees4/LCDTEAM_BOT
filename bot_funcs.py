@@ -127,6 +127,21 @@ def show_form(bot, tg_id):
         result += "Место работы: %s\n" % userdata[45]
         result += "Должность: %s\n" % userdata[46]
         result += "Обязанности: %s\n" % userdata[47]
+        if (userdata[48] == 1):
+            result += "Период работы: %s\n" % userdata[49]
+            result += "Место работы: %s\n" % userdata[50]
+            result += "Должность: %s\n" % userdata[51]
+            result += "Обязанности: %s\n" % userdata[52]
+        if (userdata[53] == 1):
+            result += "Период работы: %s\n" % userdata[54]
+            result += "Место работы: %s\n" % userdata[55]
+            result += "Должность: %s\n" % userdata[56]
+            result += "Обязанности: %s\n" % userdata[57]
+        if (userdata[58] == 1):
+            result += "Период работы: %s\n" % userdata[59]
+            result += "Место работы: %s\n" % userdata[60]
+            result += "Должность: %s\n" % userdata[61]
+            result += "Обязанности: %s\n" % userdata[62]
     else:
         result += "Наличие опыта работы: нет\n"
     result += "Участие в проектах: %s\n" % userdata[16]
