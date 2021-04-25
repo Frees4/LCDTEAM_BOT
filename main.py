@@ -887,7 +887,5 @@ buttonWorkForms = types.KeyboardButton('Работа с анкетой')
 buttonShowVacancies = types.KeyboardButton('Просмотр вакансий')
 keyboard.row(buttonWorkForms, buttonShowVacancies)
 bot.polling(none_stop=True)
-# сразу забиваем клавиатуру действий
-# это нужно, чтобы у нас не прекращалось все действо
 while True:
     pass
