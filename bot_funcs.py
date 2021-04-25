@@ -65,13 +65,13 @@ def show_vacancy_cities(bot, tg_id):
         keyboard.add(types.InlineKeyboardButton(text='Краснодар',
                                                 callback_data='krd_vacancies'))
     if (len(spb_vacancies) > 0):
-        keyboard.add(types.InlineKeyboardButton(text='Краснодар',
+        keyboard.add(types.InlineKeyboardButton(text='Санкт-Петербург',
                                                 callback_data='spb_vacancies'))
     if (len(chlb_vacancies) > 0):
-        keyboard.add(types.InlineKeyboardButton(text='Краснодар',
+        keyboard.add(types.InlineKeyboardButton(text='Челябинск',
                                                 callback_data='chlb_vacancies'))
     if (len(tvr_vacancies) > 0):
-        keyboard.add(types.InlineKeyboardButton(text='Краснодар',
+        keyboard.add(types.InlineKeyboardButton(text='Тверь',
                                                 callback_data='tvr_vacancies'))
     bot.send_message(chat_id=tg_id,
                     text="Список городов для стажировок",
@@ -201,10 +201,22 @@ def send_form(bot, tg_id):
     result.append(userdata[41]) # edu2 score
     result.append(userdata[42]) # edu additive
     result.append(userdata[43]) # job experience
-    result.append(userdata[44]) # work period
-    result.append(userdata[45]) # work place
-    result.append(userdata[46]) # work rank
-    result.append(userdata[47]) # work duty
+    result.append(userdata[44]) # work period 1
+    result.append(userdata[45]) # work place 1
+    result.append(userdata[46]) # work rank 1
+    result.append(userdata[47]) # work duty 1
+    result.append(userdata[49]) # work period 2
+    result.append(userdata[50]) # work place 2
+    result.append(userdata[51]) # work rank 2
+    result.append(userdata[52]) # work duty 2
+    result.append(userdata[54]) # work period 3
+    result.append(userdata[55]) # work place 3
+    result.append(userdata[56]) # work rank 3
+    result.append(userdata[57]) # work duty 3
+    result.append(userdata[59]) # work period 4
+    result.append(userdata[60]) # work place 4
+    result.append(userdata[61]) # work rank 4
+    result.append(userdata[62]) # work duty 4
     result.append(userdata[16]) # projects
     result.append(userdata[17]) # edu programms naumen
     result.append(userdata[18]) # key skills

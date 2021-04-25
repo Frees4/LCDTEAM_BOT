@@ -100,12 +100,15 @@ def add_forminfo_table(db_name, tablename, td_id, vals):
         query_str += "time_spend, work_after_internship, edu_type, edu_name, "
         query_str += "edu_year_start, edu_year_end, edu_faculty, edu_score, "
         query_str += "edu2_type, edu2_name, edu2_year_start, edu2_year_end, "
-        query_str += "edu2_faculty, edu2_score, additive_edu, jobexp_exist, time, place, "
-        query_str += "rank, duty, projects, naumen_eduprogs, key_skills, prof_interests, "
+        query_str += "edu2_faculty, edu2_score, additive_edu, jobexp_exist, time1, place1, "
+        query_str += "rank1, duty1, time2, place2, rank2, duty2, "
+        query_str += "time3, place3, rank3, duty3, "
+        query_str += "time4, place4, rank4, duty4, "
+        query_str += "projects, naumen_eduprogs, key_skills, prof_interests, "
         query_str += "last_read_book, hobbies, expectations, future_rank, source_info_naumen, "
         query_str += "source_info_internship, recommendations_authors, summary_hhlink, task_link)"
         query_str += "VALUES ("
-        for i in range(42):
+        for i in range(54):
             query_str += "?, "
         query_str += "?)"
         cur.execute(query_str, vals)

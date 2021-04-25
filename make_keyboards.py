@@ -75,8 +75,8 @@ def make_choose_city_keyboard():
 def make_form_actions_keyboard(tg_id):
     keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     keyboard.add(types.KeyboardButton('Сформировать новую анкету'))
-    if (db_funcs.check_user_in_db('users.db', 'users', tg_id) is not False):
-        keyboard.add(types.KeyboardButton('Просмотреть свои анкеты'))
+    #if (db_funcs.check_user_in_db('users.db', 'users', tg_id) is not False):
+        #keyboard.add(types.KeyboardButton('Просмотреть свои анкеты'))
     keyboard.row()
     return keyboard
 

@@ -17,7 +17,7 @@ bot = telebot.TeleBot(TOKEN)
 
 internship_jobs = ['Стажер-разработчик Java', 'Стажер-тестировщик',
                     'Стажер-аналитик', 'Стажер технический писатель']
-internship_cities = ['Екатеринбург', 'Санкт-Петербург', 'Челябинск', 'Тверь', 'Краснодар']
+internship_cities = ['Екатеринбург', 'Краснодар', 'Санкт-Петербург', 'Челябинск', 'Тверь', ]
 internship_timespend = ['40 часов', '>30 часов', '<30 часов']
 internship_workafterintern = ['нет, только на период стажировки',
                                 'да, полный рабочий день',
@@ -39,7 +39,7 @@ def ping(bot, timeout):
         user_ids = db_funcs.get_users_notfilled()
         for user_id in user_ids:
             bot.send_message(chat_id=user_id,
-                                text="Заполните анкету до конца!",
+                                text="Заполните анкету до конца и убедитесь, что вы выполнили тестовое задание",
                                 reply_markup=None)
         changes = False
         i = 0
@@ -59,7 +59,9 @@ def ping(bot, timeout):
                 bot.send_message(chat_id=user_id,
                                 text="Список стажировок изменился!",
                                 reply_markup=make_welcome_actions_keyboard())
-            
+
+
+
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -88,9 +90,6 @@ def echo_all(message):
             bot.send_message(message.chat.id, "Выберите действие:", reply_markup=keyboard)
         elif ( message.text.lower() == 'сформировать новую анкету' ):
             create_new_form(message.chat.id)
-        elif ( message.text.lower() == 'просмотреть свои анкеты' and 
-            db_funcs.check_user_in_db('users.db', 'users', message.chat.id) is True):
-            get_forms(bot, message.chat.id)
         elif ( message.text.lower() == 'просмотр вакансий' ):
             show_vacancy_cities(bot, message.chat.id)
         elif ( message.text.lower() == 'подписаться на уведомления о стажировках' ):
@@ -297,7 +296,8 @@ def echo_all(message):
                                     text="Введите год окончания",
                                     reply_markup=None)
                 else:
-                    if (datetime.datetime.now().year <= int(message.text)):
+                    if (re.fullmatch(pattern="^(19|20)\d{2}$", string=message.text) is not None
+                            and datetime.datetime.now().year <= int(message.text)):
                         bot.send_message(chat_id=message.chat.id,
                                         text="Введите корректную дату",
                                         reply_markup=make_formcancel_keyboard())
@@ -374,164 +374,201 @@ def echo_all(message):
                 bot.send_message(chat_id=message.chat.id,
                                 text="Есть ли у вас опыт работы?",
                                 reply_markup=make_choose_keyboard(['Да', 'Нет']))
-            elif (progress == 27):
+            elif (progress == 27 or progress == 32 or progress == 37 or progress == 42):
+                if (progress == 27):
+                    cell_tempname = "time1"
+                elif (progress == 32):
+                    cell_tempname = "time2"
+                elif (progress == 37):
+                    cell_tempname = "time3"
+                elif (progress == 42):
+                    cell_tempname = "time4"
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=28,
-                                    cell_name="time",
+                                    progress=progress+1,
+                                    cell_name=cell_tempname,
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Введите место работы",
                                 reply_markup=None)
-            elif (progress == 28):
+            elif (progress == 28 or progress == 33 or progress == 38 or progress == 43):
+                if (progress == 28):
+                    cell_tempname = "place1"
+                elif (progress == 33):
+                    cell_tempname = "place2"
+                elif (progress == 38):
+                    cell_tempname = "place3"
+                elif (progress == 43):
+                    cell_tempname = "place4"
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=29,
-                                    cell_name="place",
+                                    progress=progress+1,
+                                    cell_name=cell_tempname,
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Введите должность",
                                 reply_markup=None)
-            elif (progress == 29):
+            elif (progress == 29 or progress == 34 or progress == 39 or progress == 44):
+                if (progress == 29):
+                    cell_tempname = "rank1"
+                elif (progress == 34):
+                    cell_tempname = "rank2"
+                elif (progress == 39):
+                    cell_tempname = "rank3"
+                elif (progress == 44):
+                    cell_tempname = "rank4"
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=30,
-                                    cell_name="rank",
+                                    progress=progress+1,
+                                    cell_name=cell_tempname,
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Опишите ваши обязанности",
                                 reply_markup=None)
-            elif (progress == 30):
+            elif (progress == 30 or progress == 35 or progress == 40 or progress == 45):
+                if (progress == 30):
+                    cell_tempname = "duty1"
+                elif (progress == 35):
+                    cell_tempname = "duty2"
+                elif (progress == 40):
+                    cell_tempname = "duty3"
+                elif (progress == 45):
+                    cell_tempname = "duty4"
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=31,
-                                    cell_name="duty",
+                                    progress=progress+1,
+                                    cell_name=cell_tempname,
                                     cell_value=message.text)
-                bot.send_message(chat_id=message.chat.id,
-                                text="В каких проектах вы принимали участие?",
-                                reply_markup=None)
-            elif (progress == 31):
+                if (progress != 45):
+                    bot.send_message(chat_id=message.chat.id,
+                                    text="Добавить опыт работы",
+                                    reply_markup=make_choose_keyboard(['Да', 'Нет']))
+                else:
+                    bot.send_message(chat_id=message.chat.id,
+                                    text="В каких проектах вы принимали участие?",
+                                    reply_markup=None)
+            elif (progress == 46):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=32,
+                                    progress=47,
                                     cell_name="projects",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="""Участвовали ли вы в образовательных программах от Naumen? Если да, то расскажите об этом подробнее или поставьте прочерк -""",
                                 reply_markup=None)
-            elif (progress == 32):
+            elif (progress == 47):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=33,
+                                    progress=48,
                                     cell_name="naumen_eduprogs",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Какие свои навыки вы считаете ключевыми?",
                                 reply_markup=None)
-            elif (progress == 33):
+            elif (progress == 48):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=34,
+                                    progress=49,
                                     cell_name="key_skills",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Какие у вас профессиональные интересы?",
                                 reply_markup=None)
-            elif (progress == 34):
+            elif (progress == 49):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=35,
+                                    progress=50,
                                     cell_name="prof_interests",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Какую профессиональную книгу вы прочитали последней?",
                                 reply_markup=None)
-            elif (progress == 35):
+            elif (progress == 50):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=36,
+                                    progress=51,
                                     cell_name="last_read_book",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Как вы проводите свободное время? Какие у вас увлечения?",
                                 reply_markup=None)
-            elif (progress == 36):
+            elif (progress == 51):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=37,
+                                    progress=52,
                                     cell_name="hobbies",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Что даст тебе прохождение практики в нашей компании?",
                                 reply_markup=None)
-            elif (progress == 37):
+            elif (progress == 52):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=38,
+                                    progress=53,
                                     cell_name="expectations",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Какую должность ты хочешь занять через 3-5 лет?",
                                 reply_markup=None)
-            elif (progress == 38):
+            elif (progress == 53):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=39,
+                                    progress=54,
                                     cell_name="future_rank",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Как ты узнал о компании Naumen?",
                                 reply_markup=make_choose_keyboard(sources_info_naumen))
-            elif (progress == 40):
+            elif (progress == 55):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=41,
+                                    progress=56,
                                     cell_name="source_info_naumen",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                             text="Как ты узнал о стажировке в Naumen?",
                             reply_markup=make_choose_keyboard(sources_info_naumen))
-            elif (progress == 42):
+            elif (progress == 57):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=44,
+                                    progress=59,
                                     cell_name="source_info_internship",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="""Кто может дать вам рекомендации?
                                         (ФИО, должность, контактный телефон)""",
                                 reply_markup=None)
-            elif (progress == 43):
+            elif (progress == 58):
                 db_funcs.update_cell(db_name='users.db',
                                     tablename='users',
                                     tg_id=message.chat.id,
-                                    progress=44,
+                                    progress=59,
                                     cell_name="recommendations_authors",
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Приложите ссылку на резюме на hh.ru, если оно есть или оставьте прочерк -",
                                 reply_markup=None)
-            elif (progress == 44):
+            elif (progress == 59):
                 if (re.fullmatch(pattern="^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,})$",
                                 string=message.text) or message.text == '-'):
                     db_funcs.update_cell(db_name='users.db',
                                         tablename='users',
                                         tg_id=message.chat.id,
-                                        progress=45,
+                                        progress=60,
                                         cell_name="summary_hhlink",
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
@@ -541,7 +578,7 @@ def echo_all(message):
                     bot.send_message(chat_id=message.chat.id,
                                     text="Неправильный формат, повторите ввод",
                                     reply_markup=None)
-            elif (progress == 45):
+            elif (progress == 60):
                 if (re.fullmatch(pattern="^(https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|(?:www\.|(?!www))[a-zA-Z0-9][a-zA-Z0-9-]+[a-zA-Z0-9]\.[^\s]{2,}|https?:\/\/(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,}|(?:www\.|(?!www))[a-zA-Z0-9]+\.[^\s]{2,})$",
                                 string=message.text)):
                     db_funcs.update_cell(db_name='users.db',
@@ -566,9 +603,14 @@ def callback_worker(call):
         bot.send_message(chat_id=call.message.chat.id,
                         text='Начинаем процесс регистрации',
                         reply_markup=make_formcancel_keyboard())
+        
+        available_cities = []
+        for i in range(len(internship_cities)):
+            if (len(get_vacancies_list(city_tags[i])) > 0):
+                available_cities.append(internship_cities[i])
         bot.send_message(chat_id=call.message.chat.id,
                         text='Выберите город прохождения стажировки',
-                        reply_markup=make_choose_keyboard(internship_cities))
+                        reply_markup=make_choose_keyboard(available_cities))
     elif call.data == 'new_disagree':
         bot.send_message(chat_id=call.message.chat.id,
                         text="Создание новой анкеты было отменено",
@@ -587,9 +629,15 @@ def callback_worker(call):
                             message_id=call.message.id,
                             text="Выбран город: %s" % call.data,
                             reply_markup=None)
+        tag = 'ekb'
+        for i in range(len(internship_cities)):
+            if (call.data == internship_cities[i]):
+                tag = city_tags[i]
+                break
+        vacancies = get_vacancies_list(tag)
         bot.send_message(chat_id=call.message.chat.id,
                         text="Выберите специальность",
-                        reply_markup=make_choose_keyboard(internship_jobs))
+                        reply_markup=make_choose_keyboard(vacancies))
     elif (call.data in city_vacancies):
         if (call.data == 'ekb_vacancies'):
             city_name = 'Екатеринбург'
@@ -643,8 +691,18 @@ def callback_worker(call):
                             cell_value=call.data)
         bot.edit_message_text(chat_id=call.message.chat.id,
                             message_id=call.message.id,
-                            text="Выбрана специальность стажировки: %s" % call.data.lower(),
+                            text="Выбрана специальность стажировки: %s\nВ файле ниже тестовое задание." % call.data.lower(),
                             reply_markup=None)
+        if (call.data == google_funcs.list_name_java):
+            filename = 'javatask.pdf'
+        elif (call.data == google_funcs.list_name_tester):
+            filename = 'testertask.pdf'
+        elif (call.data == google_funcs.list_name_analytics):
+            filename = 'analytictask.pdf'
+        elif (call.data == google_funcs.list_name_techwriter):
+            filename = 'techwriter.pdf'
+        bot.send_document(chat_id=call.message.chat.id,
+                        data=open(filename, 'rb'))
         bot.send_message(chat_id=call.message.chat.id,
                         text="Введите фамилию",
                         reply_markup=make_formcancel_keyboard())
@@ -721,18 +779,29 @@ def callback_worker(call):
                                 message_id=call.message.id,
                                 text="Имеется второе образование: %s" % call.data,
                                 reply_markup=None)
-    elif (db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 26):
-        
+    elif (db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 26 or
+            db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 31 or
+            db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 36 or
+            db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 41):
+        progress = db_funcs.get_progress('users.db', 'users', call.message.chat.id)
         bot.edit_message_text(chat_id=call.message.chat.id, 
                                 message_id=call.message.id,
                                 text="Есть ли у вас опыт работы: %s" % call.data,
                                 reply_markup=None)
         if call.data.lower() == 'да':
+            if progress == 26:
+                cell_tempname = "jobexp1_exist"
+            elif progress == 31:
+                cell_tempname = "jobexp2_exist"
+            elif progress == 36:
+                cell_tempname = "jobexp3_exist"
+            elif progress == 41:
+                cell_tempname = "jobexp4_exist"
             db_funcs.update_cell(db_name='users.db',
                                 tablename='users',
                                 tg_id=call.message.chat.id,
-                                progress=27,
-                                cell_name="jobexp_exist",
+                                progress=progress+1,
+                                cell_name=cell_tempname,
                                 cell_value=1)
             bot.send_message(chat_id=call.message.chat.id,
                             text="Введите период работы (с ... до ...)",
@@ -741,14 +810,14 @@ def callback_worker(call):
             db_funcs.update_cell(db_name='users.db',
                                 tablename='users',
                                 tg_id=call.message.chat.id,
-                                progress=31,
-                                cell_name="jobexp_exist",
+                                progress=46,
+                                cell_name="jobexp1_exist",
                                 cell_value=0)
             bot.send_message(chat_id=call.message.chat.id,
                             text="В каких проектах вы принимали участие?",
                             reply_markup=None)
     elif (call.data in sources_info_naumen and
-            db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 39):
+            db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 54):
         bot.edit_message_text(chat_id=call.message.chat.id,
                             message_id=call.message.id,
                             text="Источник информации о компании: %s" % call.data,
@@ -758,19 +827,19 @@ def callback_worker(call):
                             text="Укажите источник",
                             reply_markup=None)
             db_funcs.update_progress(db_name='users.db', tablename='users',
-                                    tg_id=call.message.chat.id, progress=40)
+                                    tg_id=call.message.chat.id, progress=55)
         else:
             db_funcs.update_cell(db_name='users.db',
                                 tablename='users',
                                 tg_id=call.message.chat.id,
-                                progress=41,
+                                progress=56,
                                 cell_name="source_info_naumen",
                                 cell_value=call.data)
             bot.send_message(chat_id=call.message.chat.id,
                             text="Как вы узнали о стажировке в Naumen?",
                             reply_markup=make_choose_keyboard(sources_info_naumen))
     elif (call.data in sources_info_naumen and
-            db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 41):
+            db_funcs.get_progress('users.db', 'users', call.message.chat.id) == 56):
         bot.edit_message_text(chat_id=call.message.chat.id,
                             message_id=call.message.id,
                             text="Источник информации о стажировке: %s" % call.data,
@@ -780,12 +849,12 @@ def callback_worker(call):
                             text="Укажите источник",
                             reply_markup=None)
             db_funcs.update_progress(db_name='users.db', tablename='users',
-                                    tg_id=call.message.chat.id, progress=42)
+                                    tg_id=call.message.chat.id, progress=57)
         else:
             db_funcs.update_cell(db_name='users.db',
                                 tablename='users',
                                 tg_id=call.message.chat.id,
-                                progress=43,
+                                progress=58,
                                 cell_name="source_info_internship",
                                 cell_value=call.data)
             bot.send_message(chat_id=call.message.chat.id,
@@ -803,13 +872,17 @@ def create_new_form(tg_id):
         bot.send_message(chat_id=tg_id,
                         text='Начинаем процесс регистрации',
                         reply_markup=make_formcancel_keyboard())
+        available_cities = []
+        for i in range(len(internship_cities)):
+            if (len(get_vacancies_list(city_tags[i])) > 0):
+                available_cities.append(internship_cities[i])
         bot.send_message(chat_id=tg_id,
                         text='Выберите город прохождения стажировки',
-                        reply_markup=make_choose_keyboard(internship_cities))
+                        reply_markup=make_choose_keyboard(available_cities))
 
 
 
-ping(bot, 10.0)
+ping(bot, 86400) # 24 часа = 60*60*24 = 86400 секунд
 keyboard = types.ReplyKeyboardMarkup()
 buttonWorkForms = types.KeyboardButton('Работа с анкетой')
 buttonShowVacancies = types.KeyboardButton('Просмотр вакансий')
