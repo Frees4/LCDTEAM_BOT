@@ -23,7 +23,7 @@ Type /start and follow the bot's instructions.
 
 ## Links
 
-+  [Presentation (RUS, pre)]()
++  [Presentation](https://www.canva.com/design/DAEcnvCluDo/utsAwy40iLsrZBoglRHjpw/view?utm_content=DAEcnvCluDo&utm_campaign=designshare&utm_medium=link&utm_source=publishpresent)
 
   
 
