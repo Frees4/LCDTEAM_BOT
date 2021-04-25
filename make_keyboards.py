@@ -2,7 +2,7 @@ from telebot import types
 import db_funcs
 
 def make_actions_endfill_keyboard():
-    keyboard = types.ReplyKeyboardMarkup()
+    keyboard = types.ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add(types.KeyboardButton("Отправить форму"))
     keyboard.add(types.KeyboardButton("Просмотреть анкету"))
     keyboard.add(types.KeyboardButton("Отменить заполнение"))
@@ -61,8 +61,8 @@ def make_choose_city_keyboard():
     keyboard = types.InlineKeyboardMarkup()
     keyboard.add(types.InlineKeyboardButton(text='Екатеринбург',
                                                 callback_data='Екатеринбург'))
-    keyboard.add(types.InlineKeyboardButton(text='Москва',
-                                                callback_data='Москва'))
+    keyboard.add(types.InlineKeyboardButton(text='Краснодар',
+                                                callback_data='Краснодар'))
     keyboard.add(types.InlineKeyboardButton(text='Санкт-Петербург',
                                                 callback_data='Санкт-Петербург'))
     keyboard.add(types.InlineKeyboardButton(text='Челябинск',
@@ -73,7 +73,7 @@ def make_choose_city_keyboard():
 
 
 def make_form_actions_keyboard(tg_id):
-    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     keyboard.add(types.KeyboardButton('Сформировать новую анкету'))
     if (db_funcs.check_user_in_db('users.db', 'users', tg_id) is not False):
         keyboard.add(types.KeyboardButton('Просмотреть свои анкеты'))
@@ -82,7 +82,7 @@ def make_form_actions_keyboard(tg_id):
 
 
 def make_welcome_actions_keyboard():
-    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True)
+    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True)
     keyboard.add(types.KeyboardButton('Работа с анкетой'))
     keyboard.add(types.KeyboardButton('Просмотр вакансий'))
     keyboard.row()
@@ -90,6 +90,6 @@ def make_welcome_actions_keyboard():
 
 
 def make_formcancel_keyboard():
-    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False)
-    keyboard.add(types.KeyboardButton('Назад'), types.KeyboardButton('Отменить заполнение'))
+    keyboard = types.ReplyKeyboardMarkup(one_time_keyboard=False, resize_keyboard=True)
+    keyboard.add(types.KeyboardButton('Отменить заполнение'))
     return keyboard

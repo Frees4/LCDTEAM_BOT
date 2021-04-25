@@ -6,6 +6,7 @@ db_SPB = 'usersSPB.db'
 db_KRD = 'usersKRD.db'
 db_TVR = 'usersTVR.db'
 db_CHLB = 'usersCHLB.db'
+db_vacancies = 'vacancies.db'
 db_users = 'users.db'
 
 tableJava = 'internJava'
@@ -26,6 +27,58 @@ def check_user_in_db(db_name, tablename, tg_id):
             if (row[0] == tg_id):
                 return True
         return False
+
+def add_user_to_subscribers(tg_id):
+    con = sql.connect('users.db')
+    with con:
+        cur = con.cursor()
+        cur.execute("INSERT INTO `subscribers` (tg_id) VALUES (?)", (tg_id,))
+        con.commit()
+        cur.close()
+
+def get_users_notfilled():
+    con = sql.connect('users.db')
+    with con:
+        cur = con.cursor()
+        cur.execute("SELECT `tg_id` from `users` where `filling_progress` < 100 and `filling_form` == 1")
+        rows = cur.fetchall()
+        con.commit()
+        cur.close()
+        results = []
+        for row in rows:
+            results.append(row[0])
+        return results
+
+def clear_table_vacancies(tablename):
+    con = sql.connect(db_vacancies)
+    with con:
+        cur = con.cursor()
+        cur.execute("DELETE FROM `%s`" % tablename)
+        con.commit()
+        cur.close()
+
+def change_vacancies(tablename, values):
+    con = sql.connect(db_vacancies)
+    with con:
+        cur = con.cursor()
+        for value in values:
+            cur.execute("INSERT INTO `%s` (name_internship) VALUES (?)" % tablename, (value,))
+        con.commit()
+        cur.close()
+
+def get_parameters(db_name, tablename, parameter):
+    con = sql.connect(db_name)
+    with con:
+        cur = con.cursor()
+        cur.execute("SELECT %s FROM `%s`" % (parameter, tablename))
+        rows = cur.fetchall()
+        con.commit()
+        cur.close()
+        results = []
+        for row in rows:
+            results.append(row[0])
+        return results
+
 
 def get_new_id(db_name, tablename):
     con = sql.connect(db_name)

@@ -29,12 +29,37 @@ sources_info_naumen = ['сайт компании', 'реклама в инте�
                         'другое']
 city_vacancies = ['ekb_vacancies', 'krd_vacancies', 'spb_vacancies',
                     'chlb_vacancies', 'tvr_vacancies']
+city_tags = ['ekb', 'krasnodar', 'spb', 'chlb', 'tvr']
 
 @coroutine
-def hello(timeout):
+def ping(bot, timeout):
     while True:
         yield from sleep(timeout)
         print(datetime.datetime.now())
+        user_ids = db_funcs.get_users_notfilled()
+        for user_id in user_ids:
+            bot.send_message(chat_id=user_id,
+                                text="Заполните анкету до конца!",
+                                reply_markup=None)
+        changes = False
+        i = 0
+        old_vacancies = []
+        new_vacancies = []
+        for i in range(len(city_tags)):
+            old_vacancies = db_funcs.get_parameters('vacancies.db',
+                                                city_vacancies[i],'name_internship')
+            new_vacancies = get_vacancies_list(city_tags[i])
+            if (old_vacancies != new_vacancies):
+                changes = True
+                db_funcs.clear_table_vacancies(city_vacancies[i])
+                db_funcs.change_vacancies(city_vacancies[i], new_vacancies)
+        if (changes is True):
+            user_ids = db_funcs.get_parameters('users.db', 'subscribers', 'tg_id')
+            for user_id in user_ids:
+                bot.send_message(chat_id=user_id,
+                                text="Список стажировок изменился!",
+                                reply_markup=make_welcome_actions_keyboard())
+            
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -68,6 +93,20 @@ def echo_all(message):
             get_forms(bot, message.chat.id)
         elif ( message.text.lower() == 'просмотр вакансий' ):
             show_vacancy_cities(bot, message.chat.id)
+        elif ( message.text.lower() == 'подписаться на уведомления о стажировках' ):
+            db_funcs.add_user_to_subscribers(message.chat.id)
+            bot.send_message(chat_id=message.chat.id,
+                            text="Вы подписались на рассылку уведомлений о новых стажировках.",
+                            reply_markup=make_welcome_actions_keyboard())
+        elif ( message.text.lower() == 'отписаться от рассылки' ):
+            db_funcs.delete_user_from_db('users.db', 'subscribers', message.chat.id)
+            bot.send_message(chat_id=message.chat.id,
+                            text="Вы отписались от рассылки уведомлений о новых стажировках.",
+                            reply_markup=make_welcome_actions_keyboard())
+        elif ( message.text.lower() == 'не подписываться' or message.text.lower() == 'не отписываться'):
+            bot.send_message(chat_id=message.chat.id,
+                            text="Выберите действие",
+                            reply_markup=make_welcome_actions_keyboard())
     else:
         if (message.text.lower() == 'отправить форму'):
             send_form(bot, message.chat.id)
@@ -770,7 +809,7 @@ def create_new_form(tg_id):
 
 
 
-hello(3.0)
+ping(bot, 10.0)
 keyboard = types.ReplyKeyboardMarkup()
 buttonWorkForms = types.KeyboardButton('Работа с анкетой')
 buttonShowVacancies = types.KeyboardButton('Просмотр вакансий')
