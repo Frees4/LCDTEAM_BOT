@@ -1,21 +1,9 @@
 import sqlite3 as sql
 
-db_EKB = 'usersEKB.db'
-db_SPB = 'usersSPB.db'
-db_KRD = 'usersKRD.db'
-db_TVR = 'usersTVR.db'
-db_CHLB = 'usersCHLB.db'
-
-tableJava = 'internJava'
-tableTester = 'internTester'
-tableAnalytics = 'internAnalytics'
-tableTechWriter = 'internTechwriter'
-tableUsers = 'users'
-
 class UserHandler:
     def __init__(self):
-        self.db_vacancies = 'vacancies.db'
-        self.db_users = 'users.db'
+        self.db_vacancies = 'data/vacancies.db'
+        self.db_users = 'data/users.db'
     def check_user_in_db(self, db_name, tablename, tg_id):
         con = sql.connect(db_name)
         with con:
@@ -140,16 +128,6 @@ class UserHandler:
         with con:
             cur = con.cursor()
             cur.execute("select filling_progress from `%s` where tg_id=?" % tablename, (tg_id,))
-            result = cur.fetchone()
-            con.commit()
-            cur.close()
-            return result[0]
-
-    def check_filling(self, db_name, tablename, tg_id):
-        con = sql.connect(db_name)
-        with con:
-            cur = con.cursor()
-            cur.execute("select filling_form from `%s` where tg_id=?" % tablename, (tg_id,))
             result = cur.fetchone()
             con.commit()
             cur.close()
