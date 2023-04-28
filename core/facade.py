@@ -1,7 +1,8 @@
 # from city_handler import CityHandler
 from data.user_handler import UserHandler
 from data.user_crud_handler import UserCRUDHandler
-from spreadsheet import google_funcs
+from spreadsheet.google_spreadsheet import Spreadsheet
+from keyboard_handler import KeyboardHandler
 
 
 class Facade:
@@ -10,7 +11,8 @@ class Facade:
 #        self.city_crud_handler = CityCRUDHandler()
         self.user_handler = UserHandler()
         self.user_crud_handler = UserCRUDHandler()
-#        self.spreadsheet = Spreadsheet()
+        self.keyboard_handler = KeyboardHandler()
+        self.spreadsheet = Spreadsheet()
 
     # Методы CityHandler
 
@@ -49,6 +51,37 @@ class Facade:
         return self.user_handler.get_progress(db_name, tablename, tg_id)
 
     # Методы Spreadsheet
+    def add_new_trainee(self, table_id, list_name, values, id_bd):
+        return self.spreadsheet.add_new_trainee(table_id, list_name, values, id_bd)
+    
+    def get_forms_list(self, tg_id):
+        return self.spreadsheet.get_forms_list(tg_id)
+
+    # Методы KeyboardHandler
+    def make_actions_endfill_keyboard(self):
+        return self.keyboard_handler.make_actions_endfill_keyboard()
+    
+    def make_choose_keyboard(self, items_list):
+        return self.keyboard_handler.make_choose_keyboard(items_list)
+    
+    def make_choose_timespend_keyboard(self):
+        return self.keyboard_handler.make_choose_timespend_keyboard()
+    
+    def make_choose_job_keyboard(self):
+        return self.keyboard_handler.make_choose_job_keyboard()
+    
+    def make_choose_city_keyboard(self):
+        return self.keyboard_handler.make_choose_city_keyboard()
+    
+    def make_form_actions_keyboard(self, tg_id):
+        return self.keyboard_handler.mmake_form_actions_keyboard(tg_id)
+    
+    def make_welcome_actions_keyboard(self):
+        return self.keyboard_handler.make_welcome_actions_keyboard()
+    
+    def make_formcancel_keyboard(self):
+        return self.keyboard_handler.make_formcancel_keyboard()
+
 
     # Методы CityCRUDHandler
 
