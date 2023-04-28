@@ -1,10 +1,10 @@
 import telebot
 from telebot import types
 from core.facade import Facade
-import core.spreadsheet as sp
 from symbol import classdef
 import requests
 from bs4 import BeautifulSoup
+from config import *
 
 
 class BotHandler():
@@ -166,29 +166,16 @@ class BotHandler():
         userdata = self.facade.get_userdata('data/users.db', 'users', tg_id)
         city_internship = userdata[12]
         list_name = userdata[4]
-        if (list_name == sp.list_name_java):
-            tablename = self.facade.tableJava
-        if (list_name == sp.list_name_analytics):
-            tablename = self.facade.tableAnalytics
-        if (list_name == sp.list_name_tester):
-            tablename = self.facade.tableTester
-        if (list_name == sp.list_name_techwriter):
-            tablename = self.facade.tableTechWriter
-        if city_internship == 'Екатеринбург':
-            table_id = sp.table_ekb_id
-            db_name = self.facade.db_EKB
-        elif city_internship == 'Санкт-Петербург':
-            table_id = sp.table_spb_id
-            db_name = self.facade.db_SPB
-        elif city_internship == 'Челябинск':
-            table_id = sp.table_chlb_id
-            db_name = self.facade.db_CHLB
-        elif city_internship == 'Краснодар':
-            table_id = sp.table_krd_id
-            db_name = self.facade.db_KRD
-        elif city_internship == 'Тверь':
-            table_id = sp.table_tvr_id
-            db_name = self.facade.db_TVR
+        if (list_name == 'Стажер-разработчик Java'):
+            tablename = 'internJava'
+        if (list_name == 'Стажер-аналитик'):
+            tablename = 'internAnalytics'
+        if (list_name == 'Стажер-тестировщик'):
+            tablename = 'internTester'
+        if (list_name == 'Стажер технический писатель'):
+            tablename = 'internTechwriter'
+        table_id = table_user_id
+        db_name = db_users
         result = []
         result.append(self.facade.get_new_id(db_name, tablename))
         result.append(userdata[1]) # TG_id
@@ -248,7 +235,7 @@ class BotHandler():
         vals = tuple(result)
         
         self.facade.add_forminfo_table(db_name, tablename, result[1], vals)
-        sp.add_new_trainee(table_id, list_name, result[1:len(result)], result[0])
+        self.facade.add_new_trainee(table_id, list_name, result[1:len(result)], result[0])
         bot.send_message(chat_id=tg_id,
                         text="Форма отправлена. По всем вопросам обращайтесь: nautrainee@naumen.ru",
                         reply_markup=self.facade.make_welcome_actions_keyboard())

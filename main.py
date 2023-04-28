@@ -3,7 +3,6 @@ from telebot import types
 import datetime
 import re
 from core.facade import Facade
-import core.spreadsheet as sp
 from concurrency import coroutine, sleep, run
 
 
@@ -660,13 +659,13 @@ def callback_worker(call, tg_id):
                             reply_markup=None)
     elif (call.data in internship_jobs
                 and facade.check_filling('data/users.db', 'users', call.message.chat.id) == 0):
-        if (call.data == sp.list_name_java):
+        if (call.data == 'Стажер-разработчик Java'):
             filename = "docs/javadev.txt"
-        elif (call.data == sp.list_name_tester):
+        elif (call.data == 'Стажер-тестировщик'):
             filename = "docs/tester.txt"
-        elif (call.data == sp.list_name_analytics):
+        elif (call.data == 'Стажер-аналитик'):
             filename = "docs/analytic.txt"
-        elif (call.data == sp.list_name_techwriter):
+        elif (call.data == 'Стажер технический писатель'):
             filename = "docs/techwriter.txt"
         file = open(filename, 'r', encoding='utf-8')
         string = ''
@@ -693,13 +692,13 @@ def callback_worker(call, tg_id):
                             message_id=call.message.id,
                             text="Выбрана специальность стажировки: %s\nВ файле ниже тестовое задание." % call.data.lower(),
                             reply_markup=None)
-        if (call.data == sp.list_name_java):
+        if (call.data == 'Стажер-разработчик Java'):
             filename = 'docs/javatask.pdf'
-        elif (call.data == sp.list_name_tester):
+        elif (call.data == 'Стажер-тестировщик'):
             filename = 'docs/testertask.pdf'
-        elif (call.data == sp.list_name_analytics):
+        elif (call.data == 'Стажер-аналитик'):
             filename = 'docs/analytictask.pdf'
-        elif (call.data == sp.list_name_techwriter):
+        elif (call.data == 'Стажер технический писатель'):
             filename = 'docs/techwriter.pdf'
         bot.send_document(chat_id=call.message.chat.id,
                         data=open(filename, 'rb'))
