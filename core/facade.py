@@ -3,6 +3,7 @@ from data.user_handler import UserHandler
 from data.user_crud_handler import UserCRUDHandler
 from spreadsheet.google_spreadsheet import Spreadsheet
 from keyboard_handler import KeyboardHandler
+from bot_handler import BotHandler
 
 
 class Facade:
@@ -13,6 +14,7 @@ class Facade:
         self.user_crud_handler = UserCRUDHandler()
         self.keyboard_handler = KeyboardHandler()
         self.spreadsheet = Spreadsheet()
+        self.bot_handler = BotHandler()
 
     # Методы CityHandler
 
@@ -103,3 +105,22 @@ class Facade:
     
     def delete_user_from_db(self, db_name, tablename, tg_id):
         return self.user_crud_handler.delete_user_from_db(db_name, tablename, tg_id)
+    
+    # Методы BotHandler
+    def get_forms(self, bot, tg_id):
+        return self.bot_handler.get_forms(bot, tg_id)
+    
+    def get_vacancies_list(self, tag):
+        return self.bot_handler.get_vacancies_list(tag)
+    
+    def show_vacancies(self, bot, tg_id, tag):
+        return self.bot_handler.show_vacancies(bot, tg_id, tag)
+    
+    def show_vacancy_cities(self, bot, tg_id):
+        return self.bot_handler.show_vacancy_cities(bot, tg_id)
+    
+    def show_form(self, bot, tg_id):
+        return self.bot_handler.show_form(bot, tg_id)
+    
+    def send_form(self, bot, tg_id):
+        return self.bot_handler.send_form(bot, tg_id)
