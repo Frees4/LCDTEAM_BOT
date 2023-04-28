@@ -45,7 +45,7 @@ def ping(bot, timeout):
         old_vacancies = []
         new_vacancies = []
         for i in range(len(city_tags)):
-            old_vacancies = facade.get_parameters('vacancies.db',
+            old_vacancies = facade.get_parameters('data/vacancies.db',
                                                 city_vacancies[i],'name_internship')
             new_vacancies = facade.get_vacancies_list(city_tags[i])
             if (old_vacancies != new_vacancies):
