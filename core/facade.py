@@ -1,15 +1,16 @@
-# from city_handler import CityHandler
+from city_handler import CityHandler
+from data.city_crud_handler import CityCRUDHandler
 from data.user_handler import UserHandler
 from data.user_crud_handler import UserCRUDHandler
 from spreadsheet.google_spreadsheet import Spreadsheet
-from keyboard_handler import KeyboardHandler
-from bot_handler import BotHandler
+from client.keyboard_handler import KeyboardHandler
+from client.bot_handler import BotHandler
 
 
 class Facade:
     def __init__(self):
-#        self.city_handler = CityHandler()
-#        self.city_crud_handler = CityCRUDHandler()
+        self.city_handler = CityHandler()
+        self.city_crud_handler = CityCRUDHandler()
         self.user_handler = UserHandler()
         self.user_crud_handler = UserCRUDHandler()
         self.keyboard_handler = KeyboardHandler()
@@ -17,6 +18,14 @@ class Facade:
         self.bot_handler = BotHandler()
 
     # Методы CityHandler
+    def check_city_in_db(self, city_name):
+        return self.city_handler.check_city_in_db(city_name)
+
+    def add_city(self, city_name):
+        return self.city_handler.add_city(city_name)
+
+    def get_all_cities(self):
+        return self.city_handler.get_all_cities()
 
     # Методы UserHandler
     def check_user_in_db(self, db_name, tablename, tg_id):
@@ -86,6 +95,21 @@ class Facade:
 
 
     # Методы CityCRUDHandler
+    def add_city_to_db(self, db_name, tablename, name):
+        return self.city_crud_handler.add_city_to_db(db_name, tablename, name)
+
+    def get_citydata(self, db_name, tablename, city_id):
+        return self.city_crud_handler.get_citydata(db_name, tablename, city_id)
+
+    def get_all_cities(self, db_name, tablename):
+        return self.city_crud_handler.get_all_cities(db_name, tablename)
+    
+    def update_city(self, db_name, tablename, city_id, new_name):
+        return self.city_crud_handler.update_city(db_name, tablename, city_id, new_name)
+    
+    def delete_city_from_db(self, db_name, tablename, city_id):
+        return self.city_crud_handler.delete_city_from_db(db_name, tablename, city_id)
+    
 
     # Методы UserCrudHandler
     def add_user_to_db(self, db_name, tablename, tg_id):
