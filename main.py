@@ -3,6 +3,8 @@ from telebot import types
 import datetime
 import re
 from core.facade import Facade
+from client.bot_handler import BotHandler
+from client.keyboard_handler import KeyboardHandler
 from concurrency import coroutine, sleep, run
 
 
@@ -10,6 +12,8 @@ reader = open('token.txt', 'r')
 TOKEN = reader.read()
 bot = telebot.TeleBot(TOKEN)
 timer_working = False
+bot_handler = BotHandler()
+keyboard_handler = KeyboardHandler()
 
 
 internship_jobs = ['Стажер-разработчик Java', 'Стажер-тестировщик',
@@ -47,7 +51,7 @@ def ping(bot, timeout):
         for i in range(len(city_tags)):
             old_vacancies = facade.get_parameters('data/vacancies.db',
                                                 city_vacancies[i],'name_internship')
-            new_vacancies = facade.get_vacancies_list(city_tags[i])
+            new_vacancies = bot_handler.get_vacancies_list(city_tags[i])
             if (old_vacancies != new_vacancies):
                 changes = True
                 facade.clear_table_vacancies(city_vacancies[i])
@@ -57,13 +61,14 @@ def ping(bot, timeout):
             for user_id in user_ids:
                 bot.send_message(chat_id=user_id,
                                 text="Список стажировок изменился!",
-                                reply_markup=facade.make_welcome_actions_keyboard())
+                                reply_markup=keyboard_handler.make_welcome_actions_keyboard())
 
 
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    keyboard = facade.make_welcome_actions_keyboard()
+    print(message.chat.id)
+    keyboard = keyboard_handler.make_welcome_actions_keyboard()
     bot.send_message(message.chat.id, "Выберите действие:", reply_markup=keyboard)
     global timer_working
     if (timer_working is False):
@@ -78,32 +83,32 @@ def echo_all(message):
         facade.end_filling('data/users.db', 'users', message.chat.id)
     if (facade.check_filling('data/users.db', 'users', message.chat.id) == 0):
         if ( message.text.lower() == 'работа с анкетой' ):
-            keyboard = facade.make_form_actions_keyboard(message.chat.id)
+            keyboard = keyboard_handler.make_form_actions_keyboard(message.chat.id)
             bot.send_message(message.chat.id, "Выберите действие:", reply_markup=keyboard)
         elif ( message.text.lower() == 'сформировать новую анкету' ):
             create_new_form(message.chat.id)
         elif ( message.text.lower() == 'просмотр вакансий' ):
-            facade.show_vacancy_cities(bot, message.chat.id)
+            bot_handler.show_vacancy_cities(bot, message.chat.id)
         elif ( message.text.lower() == 'правила приема на стажировку'):
-            with open('docs/rules.txt', 'r') as file:
+            with open('docs/rules.txt', 'r', encoding='utf-8') as file:
                 rules = file.read()
             bot.send_message(chat_id=message.chat.id,
                             text=rules,
-                            reply_markup=facade.make_welcome_actions_keyboard())
+                            reply_markup=keyboard_handler.make_welcome_actions_keyboard())
         elif ( message.text.lower() == 'подписаться на рассылку' ):
             facade.add_user_to_subscribers(message.chat.id)
             bot.send_message(chat_id=message.chat.id,
                             text="Вы подписались на рассылку уведомлений о новых стажировках.",
-                            reply_markup=facade.make_welcome_actions_keyboard())
+                            reply_markup=keyboard_handler.make_welcome_actions_keyboard())
         elif ( message.text.lower() == 'отписаться от рассылки' ):
             facade.delete_user_from_db('data/users.db', 'subscribers', message.chat.id)
             bot.send_message(chat_id=message.chat.id,
                             text="Вы отписались от рассылки уведомлений о новых стажировках.",
-                            reply_markup=facade.make_welcome_actions_keyboard())
+                            reply_markup=keyboard_handler.make_welcome_actions_keyboard())
         elif ( message.text.lower() == 'не подписываться' or message.text.lower() == 'не отписываться'):
             bot.send_message(chat_id=message.chat.id,
                             text="Выберите действие",
-                            reply_markup=facade.make_welcome_actions_keyboard())
+                            reply_markup=keyboard_handler.make_welcome_actions_keyboard())
     else:
         if (message.text.lower() == 'отправить форму'):
             facade.send_form(bot, message.chat.id)
@@ -116,7 +121,7 @@ def echo_all(message):
                 pass
             bot.send_message(chat_id=message.chat.id,
                             text="Заполнение формы отменено",
-                            reply_markup=facade.make_welcome_actions_keyboard())
+                            reply_markup=keyboard_handler.make_welcome_actions_keyboard())
         else:
             # получаем прогресс заполнения формы пользователем
             progress = facade.get_progress('data/users.db', 'users', message.chat.id)
@@ -131,11 +136,11 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Введите имя",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Повторите ввод",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 3):
                 # при вводе имени
                 if (re.fullmatch(pattern="^[A-Za-zА-Яа-я]+$",
@@ -148,11 +153,11 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Введите отчество",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Повторите ввод",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 4):
                 # при вводе отчества
                 if (re.fullmatch(pattern="^[A-Za-zА-Яа-я]+$",
@@ -165,11 +170,11 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Введите дату рождения в формате дд.мм.гггг",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Повторите ввод",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 5):
                 if (re.fullmatch(pattern="^(0?[1-9]|[12]\d|30|31)[.](0?[1-9]|1[0-2])[.](\d{4})$",
                         string=message.text) is not None and datetime.datetime.now().year > int(message.text[6:10])):
@@ -181,16 +186,16 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Введите город проживания",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
                 else:
                     if (datetime.datetime.now().year <= int(message.text[6:10])):
                         bot.send_message(chat_id=message.chat.id,
                                         text="Введите корректную дату",
-                                        reply_markup=facade.make_formcancel_keyboard())
+                                        reply_markup=keyboard_handler.make_formcancel_keyboard())
                     else:
                         bot.send_message(chat_id=message.chat.id,
                                         text="Неверный формат, повторите ввод в формате дд.мм.гггг",
-                                        reply_markup=facade.make_formcancel_keyboard())
+                                        reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 6):
                 if (re.fullmatch(pattern="^[A-Za-zА-Яа-я]+$",
                                 string=message.text)):
@@ -202,11 +207,11 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Введите адрес электронной почты",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Повторите ввод",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 7):
                 if (re.fullmatch(pattern="""(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])""",
                                 string=message.text)):
@@ -218,11 +223,11 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Введите номер телефона или поставьте прочерк -",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Неверный формат, повторите ввод",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 8):
                 if (message.text == '-' or re.fullmatch(
                                             pattern="^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$",
@@ -235,11 +240,11 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Когда сможете приступить к стажировке? В формате дд.мм.гггг",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Неверный формат, повторите ввод",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 9):
                 if (re.fullmatch(pattern="^(0?[1-9]|[12]\d|30|31)[.](0?[1-9]|1[0-2])[.](\d{4})$",
                         string=message.text) is not None and datetime.datetime.strptime(message.text, "%d.%m.%Y") > datetime.datetime.now()):
@@ -251,17 +256,17 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Сколько времени в неделю ты готов уделять стажировке?",
-                                    reply_markup=facade.make_choose_keyboard(internship_timespend))
+                                    reply_markup=keyboard_handler.make_choose_keyboard(internship_timespend))
                 else:
                     if (re.fullmatch(pattern="^(0?[1-9]|[12]\d|30|31)[.](0?[1-9]|1[0-2])[.](\d{4})$",
                         string=message.text) is not None and datetime.datetime.strptime(message.text, "%d.%m.%Y") <= datetime.datetime.now()):
                         bot.send_message(chat_id=message.chat.id,
                                         text="Введите корректную дату",
-                                        reply_markup=facade.make_formcancel_keyboard())
+                                        reply_markup=keyboard_handler.make_formcancel_keyboard())
                     else:
                         bot.send_message(chat_id=message.chat.id,
                                         text="Неверный формат, повторите ввод в формате дд.мм.гггг",
-                                        reply_markup=facade.make_formcancel_keyboard())
+                                        reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 13 or progress == 20):
                 if (progress == 13):
                     cell_tempname = "edu_name"
@@ -298,11 +303,11 @@ def echo_all(message):
                             and datetime.datetime.now().year <= int(message.text)):
                         bot.send_message(chat_id=message.chat.id,
                                         text="Введите корректную дату",
-                                        reply_markup=facade.make_formcancel_keyboard())
+                                        reply_markup=keyboard_handler.make_formcancel_keyboard())
                     else:
                         bot.send_message(chat_id=message.chat.id,
                                         text="Неверный формат, повторите ввод",
-                                        reply_markup=facade.make_formcancel_keyboard())
+                                        reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 15 or progress == 22):
                 if (progress == 15):
                     cell_tempname = "edu_year_end"
@@ -322,7 +327,7 @@ def echo_all(message):
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Неверный формат, повторите ввод",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 16 or progress == 23):
                 if (progress == 16):
                     cell_tempname = "edu_faculty"
@@ -353,7 +358,7 @@ def echo_all(message):
                     if (progress == 17):
                         bot.send_message(chat_id=message.chat.id,
                                         text="Есть ли у вас второе образование?",
-                                        reply_markup=facade.make_choose_keyboard(['Да', 'Нет']))
+                                        reply_markup=keyboard_handler.make_choose_keyboard(['Да', 'Нет']))
                     else:
                         bot.send_message(chat_id=message.chat.id,
                             text="""Есть ли у вас дополнительное образование? Напишите о нем или оставьте прочерк -""",
@@ -361,7 +366,7 @@ def echo_all(message):
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Неверный формат, введите одно число не больше 5",
-                                    reply_markup=facade.make_formcancel_keyboard())
+                                    reply_markup=keyboard_handler.make_formcancel_keyboard())
             elif (progress == 25):
                 facade.update_cell(db_name='data/users.db',
                                     tablename='users',
@@ -371,7 +376,7 @@ def echo_all(message):
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Есть ли у вас опыт работы?",
-                                reply_markup=facade.make_choose_keyboard(['Да', 'Нет']))
+                                reply_markup=keyboard_handler.make_choose_keyboard(['Да', 'Нет']))
             elif (progress == 27 or progress == 32 or progress == 37 or progress == 42):
                 if (progress == 27):
                     cell_tempname = "time1"
@@ -444,7 +449,7 @@ def echo_all(message):
                 if (progress != 45):
                     bot.send_message(chat_id=message.chat.id,
                                     text="Добавить опыт работы",
-                                    reply_markup=facade.make_choose_keyboard(['Да', 'Нет']))
+                                    reply_markup=keyboard_handler.make_choose_keyboard(['Да', 'Нет']))
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="В каких проектах вы принимали участие?",
@@ -528,7 +533,7 @@ def echo_all(message):
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                                 text="Как ты узнал о компании Naumen?",
-                                reply_markup=facade.make_choose_keyboard(sources_info_naumen))
+                                reply_markup=keyboard_handler.make_choose_keyboard(sources_info_naumen))
             elif (progress == 55):
                 facade.update_cell(db_name='data/users.db',
                                     tablename='users',
@@ -538,7 +543,7 @@ def echo_all(message):
                                     cell_value=message.text)
                 bot.send_message(chat_id=message.chat.id,
                             text="Как ты узнал о стажировке в Naumen?",
-                            reply_markup=facade.make_choose_keyboard(sources_info_naumen))
+                            reply_markup=keyboard_handler.make_choose_keyboard(sources_info_naumen))
             elif (progress == 57):
                 facade.update_cell(db_name='data/users.db',
                                     tablename='users',
@@ -587,7 +592,7 @@ def echo_all(message):
                                         cell_value=message.text)
                     bot.send_message(chat_id=message.chat.id,
                                     text="Вы заполнили все поля анкеты. Выберите действие:",
-                                    reply_markup=facade.make_actions_endfill_keyboard())
+                                    reply_markup=keyboard_handler.make_actions_endfill_keyboard())
                 else:
                     bot.send_message(chat_id=message.chat.id,
                                     text="Неправильный формат. Повторите ввод",
@@ -601,19 +606,19 @@ def callback_worker(call, tg_id):
         facade.start_filling('data/users.db', 'users', tg_id)
         bot.send_message(chat_id=call.message.chat.id,
                         text='Начинаем процесс регистрации',
-                        reply_markup=facade.make_formcancel_keyboard())
+                        reply_markup=keyboard_handler.make_formcancel_keyboard())
         
         available_cities = []
         for i in range(len(internship_cities)):
-            if (len(facade.get_vacancies_list(city_tags[i])) > 0):
+            if (len(bot_handler.get_vacancies_list(city_tags[i])) > 0):
                 available_cities.append(internship_cities[i])
         bot.send_message(chat_id=call.message.chat.id,
                         text='Выберите город прохождения стажировки',
-                        reply_markup=facade.make_choose_keyboard(available_cities))
+                        reply_markup=keyboard_handler.make_choose_keyboard(available_cities))
     elif call.data == 'new_disagree':
         bot.send_message(chat_id=call.message.chat.id,
                         text="Создание новой анкеты было отменено",
-                        reply_markup=facade.make_welcome_actions_keyboard())
+                        reply_markup=keyboard_handler.make_welcome_actions_keyboard())
         bot.edit_message_reply_markup(chat_id=call.message.chat.id,
                                     message_id=call.message.id,
                                     reply_markup=None)
@@ -633,10 +638,10 @@ def callback_worker(call, tg_id):
             if (call.data == internship_cities[i]):
                 tag = city_tags[i]
                 break
-        vacancies = facade.get_vacancies_list(tag)
+        vacancies = bot_handler.get_vacancies_list(tag)
         bot.send_message(chat_id=call.message.chat.id,
                         text="Выберите специальность",
-                        reply_markup=facade.make_choose_keyboard(vacancies))
+                        reply_markup=keyboard_handler.make_choose_keyboard(vacancies))
     elif (call.data in city_vacancies):
         if (call.data == 'ekb_vacancies'):
             city_name = 'Екатеринбург'
@@ -678,7 +683,7 @@ def callback_worker(call, tg_id):
                             reply_markup=None)
         bot.send_message(chat_id=call.message.chat.id,
                         text=string,
-                        reply_markup=facade.make_welcome_actions_keyboard())
+                        reply_markup=keyboard_handler.make_welcome_actions_keyboard())
 
     elif (call.data in internship_jobs 
                 and facade.check_filling('data/users.db', 'users', call.message.chat.id) == 1):
@@ -704,7 +709,7 @@ def callback_worker(call, tg_id):
                         data=open(filename, 'rb'))
         bot.send_message(chat_id=call.message.chat.id,
                         text="Введите фамилию",
-                        reply_markup=facade.make_formcancel_keyboard())
+                        reply_markup=keyboard_handler.make_formcancel_keyboard())
     elif (call.data in internship_timespend):
         facade.update_cell(db_name='data/users.db',
                             tablename='users',
@@ -718,7 +723,7 @@ def callback_worker(call, tg_id):
                             reply_markup=None)
         bot.send_message(chat_id=call.message.chat.id,
                         text="Сможете продолжать работу после окончания стажировки?",
-                        reply_markup=facade.make_choose_keyboard(internship_workafterintern))
+                        reply_markup=keyboard_handler.make_choose_keyboard(internship_workafterintern))
     elif (call.data in internship_workafterintern):
         facade.update_cell(db_name='data/users.db',
                             tablename='users',
@@ -732,7 +737,7 @@ def callback_worker(call, tg_id):
                             reply_markup=None)
         bot.send_message(chat_id=call.message.chat.id,
                         text="Выберите тип полученного образования:",
-                        reply_markup=facade.make_choose_keyboard(edu_types))
+                        reply_markup=keyboard_handler.make_choose_keyboard(edu_types))
     elif (call.data in edu_types and facade.get_progress('data/users.db', 'users', call.message.chat.id) < 38):
         if (facade.get_progress('data/users.db', 'users', call.message.chat.id) <= 17):
             temp_progress = 13
@@ -763,7 +768,7 @@ def callback_worker(call, tg_id):
                                 cell_value=1)
             bot.send_message(chat_id=call.message.chat.id,
                         text="Выберите тип полученного образования:",
-                        reply_markup=facade.make_choose_keyboard(edu_types))
+                        reply_markup=keyboard_handler.make_choose_keyboard(edu_types))
         else:
             facade.update_cell(db_name='data/users.db',
                                 tablename='users',
@@ -836,7 +841,7 @@ def callback_worker(call, tg_id):
                                 cell_value=call.data)
             bot.send_message(chat_id=call.message.chat.id,
                             text="Как вы узнали о стажировке в Naumen?",
-                            reply_markup=facade.make_choose_keyboard(sources_info_naumen))
+                            reply_markup=keyboard_handler.make_choose_keyboard(sources_info_naumen))
     elif (call.data in sources_info_naumen and
             facade.get_progress('data/users.db', 'users', call.message.chat.id) == 56):
         bot.edit_message_text(chat_id=call.message.chat.id,
@@ -867,14 +872,14 @@ def create_new_form(tg_id):
         facade.start_filling('data/users.db', 'users', tg_id)
         bot.send_message(chat_id=tg_id,
                         text='Начинаем процесс регистрации',
-                        reply_markup=facade.make_formcancel_keyboard())
+                        reply_markup=keyboard_handler.make_formcancel_keyboard())
         available_cities = []
         for i in range(len(internship_cities)):
-            if (len(facade.get_vacancies_list(city_tags[i])) > 0):
+            if (len(bot_handler.get_vacancies_list(city_tags[i])) > 0):
                 available_cities.append(internship_cities[i])
         bot.send_message(chat_id=tg_id,
                         text='Выберите город прохождения стажировки',
-                        reply_markup=facade.make_choose_keyboard(available_cities))
+                        reply_markup=keyboard_handler.make_choose_keyboard(available_cities))
 
 
 ping(bot, 86400) # 24 часа = 60*60*24 = 86400 секунд

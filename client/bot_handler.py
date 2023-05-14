@@ -1,7 +1,8 @@
 import telebot
 from telebot import types
 from core.facade import Facade
-from symbol import classdef
+from client.keyboard_handler import KeyboardHandler
+#from symbol import classdef
 import requests
 from bs4 import BeautifulSoup
 from config import *
@@ -10,7 +11,8 @@ from config import *
 class BotHandler():
     def __init__(self):
         self.facade = Facade()
-    facade = Facade()
+        self.keyboard_handler = KeyboardHandler()
+        
     def get_forms(self, bot, tg_id):
         bot.send_message(chat_id=tg_id,
                         text="Заглушка",
@@ -28,7 +30,7 @@ class BotHandler():
         return vacancies
 
     def show_vacancies(self, bot, tg_id, tag):
-        vacancies = self.facade.get_vacancies_list(tag)
+        vacancies = self.get_vacancies_list(tag)
         keyboard = types.InlineKeyboardMarkup()
         for vacancy in vacancies:
             keyboard.add(types.InlineKeyboardButton(text=vacancy,
@@ -52,11 +54,11 @@ class BotHandler():
                         reply_markup=keyboard)
 
     def show_vacancy_cities(self, bot, tg_id):
-        ekb_vacancies = self.facade.get_vacancies_list('ekb')
-        krd_vacancies = self.facade.get_vacancies_list('krasnodar')
-        spb_vacancies = self.facade.get_vacancies_list('spb')
-        chlb_vacancies = self.facade.get_vacancies_list('chlb')
-        tvr_vacancies = self.facade.get_vacancies_list('tvr')
+        ekb_vacancies = self.get_vacancies_list('ekb')
+        krd_vacancies = self.get_vacancies_list('krasnodar')
+        spb_vacancies = self.get_vacancies_list('spb')
+        chlb_vacancies = self.get_vacancies_list('chlb')
+        tvr_vacancies = self.get_vacancies_list('tvr')
         keyboard = types.InlineKeyboardMarkup()
         if (len(ekb_vacancies) > 0):
             keyboard.add(types.InlineKeyboardButton(text='Екатеринбург',
@@ -159,7 +161,7 @@ class BotHandler():
         result += "Ссылка на тестовое задание: %s\n" % userdata[28]
         bot.send_message(chat_id=tg_id,
                         text=result,
-                        reply_markup=self.facade.make_actions_endfill_keyboard())
+                        reply_markup=self.keyboard_handler.make_actions_endfill_keyboard())
 
 
     def send_form(self, bot, tg_id):
@@ -238,5 +240,5 @@ class BotHandler():
         self.facade.add_new_trainee(table_id, list_name, result[1:len(result)], result[0])
         bot.send_message(chat_id=tg_id,
                         text="Форма отправлена. По всем вопросам обращайтесь: nautrainee@naumen.ru",
-                        reply_markup=self.facade.make_welcome_actions_keyboard())
+                        reply_markup=self.keyboard_handler.make_welcome_actions_keyboard())
         self.facade.end_filling('data/users.db', 'users', tg_id)

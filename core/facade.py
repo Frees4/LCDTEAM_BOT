@@ -1,10 +1,9 @@
-from city_handler import CityHandler
+from core.city_handler import CityHandler
 from data.city_crud_handler import CityCRUDHandler
 from data.user_handler import UserHandler
 from data.user_crud_handler import UserCRUDHandler
-from spreadsheet.google_spreadsheet import Spreadsheet
+from core.spreadsheet.google_spreadsheet import Spreadsheet
 from client.keyboard_handler import KeyboardHandler
-from client.bot_handler import BotHandler
 
 
 class Facade:
@@ -15,7 +14,6 @@ class Facade:
         self.user_crud_handler = UserCRUDHandler()
         self.keyboard_handler = KeyboardHandler()
         self.spreadsheet = Spreadsheet()
-        self.bot_handler = BotHandler()
 
     # Методы CityHandler
     def check_city_in_db(self, city_name):
@@ -68,31 +66,6 @@ class Facade:
     def get_forms_list(self, tg_id):
         return self.spreadsheet.get_forms_list(tg_id)
 
-    # Методы KeyboardHandler
-    def make_actions_endfill_keyboard(self):
-        return self.keyboard_handler.make_actions_endfill_keyboard()
-    
-    def make_choose_keyboard(self, items_list):
-        return self.keyboard_handler.make_choose_keyboard(items_list)
-    
-    def make_choose_timespend_keyboard(self):
-        return self.keyboard_handler.make_choose_timespend_keyboard()
-    
-    def make_choose_job_keyboard(self):
-        return self.keyboard_handler.make_choose_job_keyboard()
-    
-    def make_choose_city_keyboard(self):
-        return self.keyboard_handler.make_choose_city_keyboard()
-    
-    def make_form_actions_keyboard(self, tg_id):
-        return self.keyboard_handler.mmake_form_actions_keyboard(tg_id)
-    
-    def make_welcome_actions_keyboard(self):
-        return self.keyboard_handler.make_welcome_actions_keyboard()
-    
-    def make_formcancel_keyboard(self):
-        return self.keyboard_handler.make_formcancel_keyboard()
-
 
     # Методы CityCRUDHandler
     def add_city_to_db(self, db_name, tablename, name):
@@ -130,21 +103,3 @@ class Facade:
     def delete_user_from_db(self, db_name, tablename, tg_id):
         return self.user_crud_handler.delete_user_from_db(db_name, tablename, tg_id)
     
-    # Методы BotHandler
-    def get_forms(self, bot, tg_id):
-        return self.bot_handler.get_forms(bot, tg_id)
-    
-    def get_vacancies_list(self, tag):
-        return self.bot_handler.get_vacancies_list(tag)
-    
-    def show_vacancies(self, bot, tg_id, tag):
-        return self.bot_handler.show_vacancies(bot, tg_id, tag)
-    
-    def show_vacancy_cities(self, bot, tg_id):
-        return self.bot_handler.show_vacancy_cities(bot, tg_id)
-    
-    def show_form(self, bot, tg_id):
-        return self.bot_handler.show_form(bot, tg_id)
-    
-    def send_form(self, bot, tg_id):
-        return self.bot_handler.send_form(bot, tg_id)
